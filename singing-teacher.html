@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ตารางสอนร้องเพลง</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--bg:#f2f4f7;--card:#fff;--tx:#18222d;--mut:#5b6877;--ac:#1f3a5f;--acx:#fff;--bd:#d6dde5;--side:#13263d;--ok:#15803d;--bad:#b91c1c;--school:#1d4ed8;--home:#b45309;--online:#0f766e;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e151d;--card:#16202b;--tx:#e5ebf1;--mut:#90a0b0;--ac:#7db0e6;--acx:#0e151d;--bd:#2a3744;--side:#0a1018;--ok:#4ade80;--bad:#f87171;--school:#7aa2ff;--home:#fbbf24;--online:#2dd4bf;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e151d;--card:#16202b;--tx:#e5ebf1;--mut:#90a0b0;--ac:#7db0e6;--acx:#0e151d;--bd:#2a3744;--side:#0a1018;--ok:#4ade80;--bad:#f87171;--school:#7aa2ff;--home:#fbbf24;--online:#2dd4bf;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.55 'IBM Plex Sans Thai',Sarabun,system-ui,sans-serif}
+main{max-width:1180px;margin:0 auto;padding:14px 18px 40px}
+h1{font-size:20px;margin:6px 0 10px}h2{font-size:17px;margin:18px 0 8px}
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tabs button{flex:1;padding:9px 2px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;font:inherit;font-size:14px}
+.tabs button.on{background:var(--ac);color:var(--acx);border-color:var(--ac);font-weight:700}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:11px 13px;margin:8px 0;border-left:5px solid var(--bd)}
+.card.school{border-left-color:var(--school)}.card.home{border-left-color:var(--home)}.card.online{border-left-color:var(--online)}
+.card.absent,.card.cancel{opacity:.6}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.nm{font-weight:700;font-size:17px}.nm small{font-weight:400;color:var(--mut);font-size:14px}
+.b{font-size:12px;padding:2px 9px;border-radius:99px;border:1px solid currentColor;white-space:nowrap}
+.b.school{color:var(--school)}.b.home{color:var(--home)}.b.online{color:var(--online)}
+.mut{color:var(--mut);font-size:14px}
+button,input,select,textarea{font:inherit;color:var(--tx)}
+.btn{padding:7px 12px;border-radius:9px;border:1px solid var(--bd);background:var(--card);cursor:pointer}
+.btn.pri{background:var(--ac);color:var(--acx);border-color:var(--ac);font-weight:700}
+.btn.ok.on{background:var(--ok);color:#fff;border-color:var(--ok)}.btn.bad.on{background:var(--bad);color:#fff;border-color:var(--bad)}.btn.gr.on{background:var(--mut);color:var(--bg)}
+.acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+input,select,textarea{width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:9px;background:var(--bg)}
+textarea{min-height:56px;margin-top:8px;resize:vertical}
+label{display:block;font-size:13px;color:var(--mut);margin:9px 0 3px}		
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat div{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px 12px}
+.stat b{display:block;font-size:22px;color:var(--ac)}.stat span{font-size:13px;color:var(--mut)}
+.chart{display:flex;align-items:flex-end;gap:4px;height:150px;margin-top:10px}
+.chart i{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font-style:normal;font-size:10px;color:var(--mut)}
+.chart u{display:block;width:100%;background:var(--ac);border-radius:4px 4px 0 0;text-decoration:none;min-height:2px}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}.tbl td,.tbl th{padding:6px 4px;border-bottom:1px solid var(--bd);text-align:right}.tbl td:first-child,.tbl th:first-child{text-align:left}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;z-index:9}
+.sheet{background:var(--bg);width:100%;max-width:680px;max-height:92%;overflow:auto;border-radius:16px 16px 0 0;padding:14px 14px calc(18px + env(safe-area-inset-bottom,0px))}
+.wd{display:flex;justify-content:space-between;align-items:center;margin-top:14px}.wd b.t{color:var(--ac)}
+.seg{display:flex;gap:6px;margin:8px 0}.seg button{flex:1}
+.empty{padding:22px;text-align:center;color:var(--mut)}
+.shell{display:grid;grid-template-columns:190px 1fr;gap:22px;align-items:start}aside{position:sticky;top:14px}
+.tabs{flex-direction:column}.tabs button{flex:none;text-align:left;padding:10px 14px}
+@media(max-width:820px){.shell{grid-template-columns:1fr}aside{position:static}.tabs{flex-direction:row;flex-wrap:wrap}.tabs button{flex:1;text-align:center;padding:9px 4px}.split{grid-template-columns:1fr!important}}
+@media(min-width:821px){.ov{align-items:center}.sheet{border-radius:16px}}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.cal>div{min-height:96px;background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:4px;overflow:hidden;cursor:pointer}.cal .h{min-height:0;text-align:center;background:none;border:0;color:var(--mut);cursor:default}
+.cal .d{font-size:12px;color:var(--mut)}.cal .tdy{border:2px solid var(--ac)}.cal .o{opacity:.45}
+.ev{font-size:11px;border-radius:4px;padding:1px 4px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--acx)}.ev.school{background:var(--school)}.ev.home{background:var(--home)}.ev.online{background:var(--online)}
+.split{display:grid;grid-template-columns:230px 1fr;gap:18px}
+.ph{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.ph img{width:84px;height:84px;object-fit:cover;border-radius:8px;border:1px solid var(--bd);cursor:pointer}
+.card,.stat div,.sheet,.cal>div,.ph img,.ev{border-radius:5px}.btn,input,select,textarea{border-radius:4px}
+aside{background:var(--side);border-radius:8px;padding:18px 14px}aside h1{color:#fff;font-size:16px;line-height:1.35;margin:0 0 16px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.15)}
+.tabs button{background:transparent;color:#cfdbe8;border-color:transparent;border-radius:5px}.tabs button.on{background:rgba(255,255,255,.16);color:#fff;font-weight:600}
+.rwrap{overflow-x:auto;border:1px solid var(--bd);border-radius:6px;margin-top:12px;background:#fff}
+.rpt{background:#fff;color:#111;padding:28px;font-size:13px;width:794px}.rpt h2{font-size:20px;margin:0 0 4px;color:#13263d}.rpt h3{font-size:15px;margin:18px 0 6px;color:#13263d}.rpt .rm{color:#555;font-size:12px}
+.rpt .rs{display:flex;gap:28px;margin:14px 0;padding:10px 12px;background:#eef2f7}.rpt .rs b{display:block;font-size:17px}.rpt table{width:100%;border-collapse:collapse}.rpt th{background:#13263d;color:#fff;text-align:left;padding:5px 6px;font-weight:600}.rpt td{padding:5px 6px;border-bottom:1px solid #d6dde5;vertical-align:top}.rpt .nt td{color:#444;font-size:12px}
+.slip .sh{display:flex;justify-content:space-between;align-items:flex-end;background:#13263d;color:#fff;margin:-28px -28px 16px;padding:22px 28px}.slip .st1{font-size:22px;font-weight:700}.slip .st2{font-size:12px;opacity:.8}.slip .sr{text-align:right;font-size:13px}
+.slip .sg{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:12px 0}.slip .sg label,.slip .net label{display:block;font-size:11px;color:#667;margin:0}.slip .sg b{font-size:14px}
+.slip .n{text-align:right}.slip .tt td{font-weight:700;background:#eef2f7}
+.slip .net{margin:14px 0;padding:14px 16px;border:2px solid #13263d;display:flex;justify-content:space-between;align-items:center;gap:16px}.slip .net b{font-size:26px;color:#13263d}.slip .bt{font-size:13px;color:#333;text-align:right}
+.slip .sig{align-self:end;text-align:center;font-size:12px;margin-top:30px}.slip .fn{margin-top:16px;font-size:11px;color:#667}
+.slip{border:1px solid #888}.slip .ti{text-align:center;border-bottom:3px double #13263d;padding-bottom:10px;margin-bottom:12px}.slip .t1{font-size:22px;font-weight:700;color:#13263d}.slip .t2{font-size:12px;color:#555;letter-spacing:.5px}
+.slip .meta{display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px}.slip .bx{border:1px solid #444;padding:8px 12px;margin:8px 0;line-height:1.75}.slip .bx b{display:inline-block;min-width:150px;font-weight:600}
+.slip table{border:1px solid #444;margin-top:8px}.slip th{background:#e6ebf1;color:#111;border:1px solid #444;text-align:center}.slip td{border:1px solid #888}.slip .n{text-align:right}.slip .c{text-align:center}.slip .tt td{font-weight:700;background:#f1f4f8}
+.slip .net{margin:10px 0;padding:10px 14px;border:2px solid #13263d;display:flex;justify-content:space-between;align-items:center;gap:14px}.slip .net b{font-size:22px;color:#13263d}.slip .bt{font-size:13px;text-align:right}
+.slip .sigs{display:flex;justify-content:space-between;align-items:flex-end;margin-top:12px;font-size:13px;line-height:1.8}.slip .sigs>div:last-child{text-align:center;margin-top:26px}.slip .fn{margin-top:14px;font-size:11px;color:#555;border-top:1px solid #aaa;padding-top:6px}
+#boot{position:fixed;inset:0;z-index:30;background:var(--bg);display:flex;align-items:center;justify-content:center;color:var(--mut)}#boot[hidden]{display:none}
+#bn{background:#fde8e8;color:#8a1c1c;border:1px solid #f0b4b4;padding:10px 12px;border-radius:6px;margin-bottom:10px;font-size:14px}#bn[hidden]{display:none}
+.ai{white-space:pre-wrap;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-top:12px}
+</style></head><body><main>
+<div id="boot">กำลังโหลดข้อมูล…</div><div class="shell"><aside><h1>ระบบบริหารงานสอนร้องเพลง</h1>
+<div class="tabs" id="tabs"></div><div id="stat" style="margin-top:14px;font-size:12px;color:#9fb2c8">กำลังเชื่อมต่อระบบ…</div></aside><div><div id="bn" hidden></div><div id="app"></div></div></div></main><div id="modal2"></div><div id="modal"></div>
+<script>
+const K='singteach.v1',TL={school:'โรงเรียน',home:'รับเอง',online:'ออนไลน์'},ST={planned:'นัดไว้',done:'มาเรียน',absent:'ขาด',cancel:'ยกเลิก'};
+const MN=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const def=()=>({students:[],subjects:['ร้องเพลงป๊อป','เทคนิคการหายใจ','ทฤษฎีดนตรี','เตรียมออดิชั่น'].map((name,i)=>({id:'s'+i,name})),places:[{id:'p1',name:'สตูดิโอที่บ้าน',type:'home',rate:0},{id:'p2',name:'ออนไลน์ (Zoom)',type:'online',rate:0},{id:'p3',name:'โรงเรียน (แก้ชื่อได้)',type:'school',rate:0}],lessons:[]});
+let S;try{S=JSON.parse(localStorage.getItem(K))}catch(e){}if(!S)S=def();S.pay=S.pay||{};
+const isPaid=l=>!!S.pay[l.date.slice(0,7)+'|'+l.placeId];
+function settle(){const m={};S.lessons.filter(l=>l.status=='done').forEach(l=>{const k=l.date.slice(0,7)+'|'+l.placeId,r=m[k]=m[k]||{h:0,a:0};r.h+=l.hours;r.a+=inc(l)});const ks=Object.keys(m).sort().reverse().slice(0,36);
+return `<h2>ปิดยอดรายเดือน (โรงเรียนจ่ายจากชั่วโมงสะสมทุกสิ้นเดือน)</h2><table class="tbl"><tr><th>เดือน · สถานที่</th><th>ชม.</th><th>ยอด</th><th>สถานะ</th></tr>${ks.map(k=>{const[mo,p]=k.split('|'),pl=find('places',p),[y,n]=mo.split('-');return `<tr><td>${MN[n-1]} ${+y+543} · ${pl?esc(pl.name):'—'}</td><td>${m[k].h}</td><td>${money(m[k].a)}</td><td><button class="btn ${S.pay[k]?'ok on':''}" data-a="pay" data-v="${k}">${S.pay[k]?'จ่ายแล้ว':'รอจ่าย'}</button></td></tr>`}).join('')||'<tr><td class="mut">ยังไม่มีคาบที่เช็คชื่อ</td><td></td><td></td><td></td></tr>'}</table>`}
+let DBH=null,dirty=false,SV={},Q=Promise.resolve();const setStat=t=>{const e=document.querySelector('#stat');if(e)e.textContent=t;const b=document.querySelector('#bn');if(b){const bad=/ไม่|ล้มเหลว/.test(t);b.hidden=!bad;b.textContent=bad?'⚠ '+t+' — ข้อมูลที่กรอกอาจไม่ถูกเก็บถาวร':''}};
+function persist(){if(!DBH){setStat('ยังเชื่อมต่อระบบบันทึกไม่ได้');return}clearTimeout(persist.t);setStat('กำลังบันทึก…');persist.t=setTimeout(()=>{Q=Q.then(async()=>{try{const docs={core:{pay:S.pay,prof:S.prof||{}}},by={};S.students.forEach(x=>docs['u'+x.id]=x);S.subjects.forEach(x=>docs['b'+x.id]=x);S.places.forEach(x=>docs['p'+x.id]=x);
+S.lessons.forEach(l=>(by[l.date.slice(0,7)]=by[l.date.slice(0,7)]||[]).push(l));for(const m in by)docs['m'+m]={lessons:by[m]};
+for(const k in SV)if(!(k in docs))docs[k]=/^m/.test(k)?{lessons:[]}:null;
+for(const k of Object.keys(docs).sort((a,b)=>(a=='core')-(b=='core'))){const j=JSON.stringify(docs[k]);if(SV[k]!==j){const r=DBH.collection('app').doc(k);if(docs[k]===null){await r.delete();delete SV[k]}else{await r.set(JSON.parse(j));SV[k]=j}}}
+setStat('✓ บันทึกแล้ว')}catch(e){setStat('บันทึกไม่สำเร็จ: '+((e&&e.message)||'ลองใหม่'))}})},700)}
+const bootOff=()=>{const b=document.querySelector('#boot');if(b)b.hidden=true};setTimeout(bootOff,10000);
+async function dbLoad(){try{const db=await claude.use('db');if(!db)throw {message:'ระบบบันทึกไม่พร้อมใช้งานบนหน้านี้'};const sn=await db.collection('app').get();
+if(!sn.empty){const T={students:[],subjects:[],places:[],pay:{},lessons:[]},add=(k,x)=>{if(x&&x.id&&!T[k].some(y=>y.id==x.id))T[k].push(x)};
+sn.docs.forEach(d=>{const x=d.data()||{};SV[d.id]=JSON.stringify(x);const c=d.id[0];
+if(d.id=='core'){T.pay=x.pay||{};T.prof=x.prof||{};['students','subjects','places'].forEach(k=>(x[k]||[]).forEach(y=>add(k,y)))}
+else if(c=='u')add('students',x);else if(c=='b')add('subjects',x);else if(c=='p')add('places',x);else if(c=='m')T.lessons.push(...(x.lessons||[]))});
+if(dirty)['students','subjects','places','lessons'].forEach(k=>S[k].forEach(x=>{if(!/^(s[0-3]|p[1-3])$/.test(x.id)&&!T[k].some(y=>y.id==x.id))T[k].push(x)}));
+['students','subjects','places'].forEach(k=>T[k].sort((a,b)=>String(a.name).localeCompare(String(b.name),'th')));S=T;S.pay=S.pay||{}}
+DBH=db;if(sn.empty||dirty)persist();else setStat('✓ ซิงก์แล้ว');dirty=false;R()}catch(e){setStat('เชื่อมต่อระบบไม่ได้ ('+((e&&e.message)||'ไม่ทราบสาเหตุ')+') จะบันทึกในเครื่องนี้เท่านั้น')}finally{bootOff();if(!DBH)setTimeout(dbLoad,6000)}}
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}if(!DBH)dirty=true;persist()};
+const $=s=>document.querySelector(s),uid=()=>Math.random().toString(36).slice(2,9);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const pd=s=>{const[a,b,c]=s.split('-');return new Date(+a,b-1,+c)};
+const addD=(d,n)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);
+const wk=d=>addD(d,-((d.getDay()+6)%7));
+const money=n=>Math.round(n).toLocaleString('th-TH')+' ฿';
+const th=(d,o)=>d.toLocaleDateString('th-TH',o);
+const inc=l=>l.hours*l.rate;
+const find=(k,id)=>S[k].find(x=>x.id==id);
+let tab='today',wo=0,mode='month',yr=new Date().getFullYear(),tmp=null;
+const TABS=[['today','วันนี้'],['cal','ปฏิทิน'],['stu','นักเรียน'],['dash','แดชบอร์ด'],['ai','ถามเอไอ'],['rep','รายงาน PDF'],['set','ตั้งค่า']];
+const sorted=a=>[...a].sort((x,y)=>(x.date+x.start).localeCompare(y.date+y.start));
+
+function card(l,full){const s=find('students',l.studentId),u=find('subjects',l.subjectId),p=find('places',l.placeId);
+return `<div class="card ${p?p.type:''} ${l.status}"><div class="row"><b>${l.start} น. · ${l.hours} ชม.</b><span class="b ${p?p.type:''}">${p?TL[p.type]+': '+esc(p.name):'—'}</span></div>
+<div class="row"><div class="nm" style="display:flex;align-items:center;gap:8px">${s?av(s,30):''}<span>${s?esc(s.name):'(ไม่ระบุนักเรียน)'} <small>${u?esc(u.name):''}</small></span></div><button class="btn" data-a="edit" data-id="${l.id}">แก้ไข</button></div>
+<div class="mut">${l.status!='planned'?ST[l.status]+' · ':''}${money(inc(l))}</div>
+${full?`<div class="acts">${['done','absent','cancel'].map(k=>`<button class="btn ${k=='done'?'ok':k=='absent'?'bad':'gr'} ${l.status==k?'on':''}" data-a="st" data-id="${l.id}" data-v="${k}">${k=='done'?'✓ ':''}${ST[k]}</button>`).join('')}</div>
+<textarea data-a="note" data-id="${l.id}" placeholder="บันทึกการสอนครั้งนี้ เช่น เรื่องที่สอน">${esc(l.note)}</textarea>
+<textarea data-a="hw" data-id="${l.id}" placeholder="การบ้านที่มอบหมาย">${esc(l.homework)}</textarea><div class="acts"><button class="btn" data-a="cam" data-id="${l.id}">📷 ถ่ายภาพ</button><button class="btn" data-a="up" data-id="${l.id}">🖼 อัปโหลดรูป</button></div><div class="ph">${phs(l.photos)}</div>`:(l.note?`<div class="mut">📝 ${esc(l.note)}</div>`:'')+(l.homework?`<div class="mut">📚 ${esc(l.homework)}</div>`:'')+`<div class="ph">${phs(l.photos)}</div>`}</div>`}
+
+function vToday(){const t=iso(new Date()),ls=sorted(S.lessons.filter(l=>l.date==t)),h=ls.filter(l=>l.status!='cancel').reduce((a,l)=>a+l.hours,0);
+return `<h2>${th(new Date(),{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</h2><div class="mut">${ls.length} คาบ · ${h} ชั่วโมง</div>
+${ls.map(l=>card(l,1)).join('')||'<div class="empty">วันนี้ยังไม่มีคาบสอน</div>'}<button class="btn pri" data-a="new" data-d="${t}">+ เพิ่มคาบวันนี้</button>`}
+
+function vWeek(){const s=addD(wk(new Date()),wo*7);let h=`<div class="row"><button class="btn" data-a="wk" data-v="-1">‹</button><b>${th(s,{day:'numeric',month:'short'})} – ${th(addD(s,6),{day:'numeric',month:'short',year:'numeric'})}</b><button class="btn" data-a="wk" data-v="1">›</button></div>`;
+for(let i=0;i<7;i++){const d=addD(s,i),k=iso(d),ls=sorted(S.lessons.filter(l=>l.date==k));
+h+=`<div class="wd"><b class="${k==iso(new Date())?'t':''}">${th(d,{weekday:'long',day:'numeric',month:'short'})}</b><button class="btn" data-a="new" data-d="${k}">+</button></div>${ls.map(l=>card(l,0)).join('')}`}return h}
+
+function vDash(){const D=S.lessons.filter(l=>l.status=='done'),now=new Date(),w0=iso(wk(now)),m0=iso(now).slice(0,7),y0=String(now.getFullYear());
+const sum=f=>{const a=D.filter(f);return[a.reduce((x,l)=>x+l.hours,0),a.reduce((x,l)=>x+inc(l),0)]};
+const W=sum(l=>iso(wk(pd(l.date)))==w0),M=sum(l=>l.date.slice(0,7)==m0),Y=sum(l=>l.date.slice(0,4)==y0),A=sum(()=>1);
+let keys=[],lab=[],bk;
+if(mode=='week'){bk=l=>iso(wk(pd(l.date)));for(let i=9;i>=0;i--){const d=addD(wk(now),-7*i);keys.push(iso(d));lab.push(d.getDate()+'/'+(d.getMonth()+1))}}
+else if(mode=='month'){bk=l=>l.date.slice(0,7);for(let i=0;i<12;i++){keys.push(yr+'-'+String(i+1).padStart(2,'0'));lab.push(MN[i])}}
+else{bk=l=>l.date.slice(0,4);const mn=Math.min(now.getFullYear(),...D.map(l=>+l.date.slice(0,4)));for(let y=mn;y<=now.getFullYear();y++){keys.push(String(y));lab.push(y+543)}}
+const vals=keys.map(k=>sum(l=>bk(l)==k)),mx=Math.max(1,...vals.map(v=>v[1]));
+const grp=(k)=>S[k].map(x=>{const a=D.filter(l=>l[{students:'studentId',subjects:'subjectId',places:'placeId'}[k]]==x.id);return[x.name+(x.type?' ('+TL[x.type]+')':''),a.reduce((s,l)=>s+l.hours,0),a.reduce((s,l)=>s+inc(l),0),a.filter(l=>!isPaid(l)).reduce((s,l)=>s+inc(l),0)]}).filter(r=>r[1]>0).sort((a,b)=>b[2]-a[2]);
+const tb=(t,k)=>`<h2>${t}</h2><table class="tbl"><tr><th></th><th>ชม.</th><th>รายได้</th><th>จ่ายแล้ว</th><th>รอจ่าย</th></tr>${grp(k).map(r=>`<tr><td>${esc(r[0])}</td><td>${r[1]}</td><td>${money(r[2])}</td><td>${money(r[2]-r[3])}</td><td>${money(r[3])}</td></tr>`).join('')||'<tr><td class="mut">ยังไม่มีข้อมูล</td><td></td><td></td><td></td><td></td></tr>'}</table>`;
+return `<div class="stat"><div><b>${A[0]} ชม.</b><span>ชั่วโมงสอนสะสมทั้งหมด</span></div><div><b>${money(A[1])}</b><span>รายได้สะสมทั้งหมด</span></div>
+<div><b>${money(W[1])}</b><span>สัปดาห์นี้ · ${W[0]} ชม.</span></div><div><b>${money(M[1])}</b><span>เดือนนี้ · ${M[0]} ชม.</span></div><div><b>${money(Y[1])}</b><span>ปีนี้ · ${Y[0]} ชม.</span></div><div><b style="color:var(--bad)">${money(D.filter(l=>!isPaid(l)).reduce((a,l)=>a+inc(l),0))}</b><span>รอโรงเรียนจ่าย (ยังไม่ปิดยอด)</span></div></div>
+<p class="mut">นับเฉพาะคาบที่เช็คชื่อว่า “มาเรียน”</p>
+<div class="seg">${[['week','รายสัปดาห์'],['month','รายเดือน'],['year','รายปี']].map(m=>`<button class="btn ${mode==m[0]?'pri':''}" data-a="mode" data-v="${m[0]}">${m[1]}</button>`).join('')}</div>
+${mode=='month'?`<div class="row"><button class="btn" data-a="yr" data-v="-1">‹</button><b>พ.ศ. ${yr+543}</b><button class="btn" data-a="yr" data-v="1">›</button></div>`:''}
+<div class="chart">${vals.map((v,i)=>`<i title="${v[0]} ชม.">${v[1]?Math.round(v[1]/1000*10)/10+'k':''}<u style="height:${v[1]/mx*115}px"></u>${lab[i]}</i>`).join('')}</div>
+<div class="mut" style="margin-top:6px">ยอดในกราฟเป็นหน่วยพันบาท (k) · รวมช่วงนี้ ${money(vals.reduce((a,v)=>a+v[1],0))} / ${vals.reduce((a,v)=>a+v[0],0)} ชม.</div>
+${settle()}${tb('แยกตามนักเรียน','students')}${tb('แยกตามวิชา','subjects')}${tb('แยกตามสถานที่','places')}`}
+
+function vSet(){const li=(k,x,ex)=>`<div class="card"><div class="row"><div>${esc(x.name)} ${ex||''}</div><button class="btn" data-a="rm" data-k="${k}" data-id="${x.id}">ลบ</button></div>${k!='subjects'?`<label>ค่าสอนต่อชั่วโมง (฿)</label><input type="number" data-a="rate" data-k="${k}" data-id="${x.id}" value="${x.rate||0}">`:''}</div>`;
+return `<h2>ข้อมูลผู้รับเงิน (ใช้ในใบสรุปรายได้)</h2><div class="card"><label style="margin-top:0">ชื่อ-นามสกุล</label><input data-a="prof" data-f="name" value="${esc(PR().name)}"><label>เลขประจำตัวประชาชน 13 หลัก</label><input data-a="prof" data-f="taxId" inputmode="numeric" maxlength="13" value="${esc(PR().taxId)}"><label>ที่อยู่ (ไม่บังคับ ใส่แล้วจะขึ้นในเอกสาร)</label><input data-a="prof" data-f="addr" value="${esc(PR().addr)}"><label>อัตราหัก ณ ที่จ่ายที่โรงเรียนหัก (%) — ไม่มีให้ใส่ 0</label><input type="number" min="0" max="100" step="0.5" data-a="prof" data-f="wht" value="${(S.prof||{}).wht||0}"></div>
+<h2>วิชา</h2>${S.subjects.map(x=>li('subjects',x)).join('')}<input id="n_subjects" placeholder="ชื่อวิชา"><button class="btn pri" style="margin-top:6px" data-a="add" data-k="subjects">+ เพิ่มวิชา</button>
+<h2>สถานที่สอน (โรงเรียน / รับเอง / ออนไลน์)</h2>${S.places.map(x=>li('places',x,`<span class="b ${x.type}">${TL[x.type]}</span>`)).join('')}
+<div class="g2"><input id="n_places" placeholder="ชื่อสถานที่"><select id="t_places"><option value="school">โรงเรียน</option><option value="home">รับเอง</option><option value="online">ออนไลน์</option></select></div><button class="btn pri" style="margin-top:6px" data-a="add" data-k="places">+ เพิ่มสถานที่</button>
+<h2>สำรองข้อมูล</h2><p class="mut">ข้อมูลบันทึกอัตโนมัติบนระบบ ใช้ได้ทุกเครื่องที่ล็อกอินบัญชีเดียวกัน ควรสำรองเป็นระยะ (รูปภาพไม่รวมในข้อมูลสำรอง)</p>
+<div class="acts"><button class="btn" data-a="export">แสดงข้อมูลสำรอง</button><button class="btn" data-a="import">นำเข้าจากข้อความ</button></div><textarea id="bk" style="min-height:90px" placeholder="วางข้อมูลสำรองที่นี่เพื่อนำเข้า"></textarea>`}
+
+function R(){$('#tabs').innerHTML=TABS.map(t=>`<button class="${tab==t[0]?'on':''}" data-a="tab" data-v="${t[0]}">${t[1]}</button>`).join('');$('#app').innerHTML={today:vToday,cal:vCal,stu:vStu,dash:vDash,ai:vAi,rep:vRpt,set:vSet}[tab]()}
+
+function sel(id,k,v){return `<select id="${id}">${S[k].map(x=>`<option value="${x.id}" ${x.id==v?'selected':''}>${esc(x.name)}${x.type?' ('+TL[x.type]+')':''}</option>`).join('')}</select>`}
+function edit(id,d){const n=!id,l=id?{...find('lessons',id)}:{date:d,start:'09:00',hours:1,studentId:S.students[0]?.id,subjectId:S.subjects[0]?.id,placeId:S.places[0]?.id,rate:0,status:'planned',note:''};
+if(n)l.rate=rateFor(l.studentId,l.placeId);tmp=id;tmpPh=[...(l.photos||[])];
+$('#modal').innerHTML=`<div class="ov"><div class="sheet"><h2 style="margin-top:0">${n?'เพิ่มคาบสอน':'แก้ไขคาบสอน'}</h2>
+${S.students.length?'':'<p class="mut">ยังไม่มีนักเรียน ไปเพิ่มที่แท็บ “ตั้งค่า” ก่อนนะครับ</p>'}
+<div class="g2"><div><label>วันที่</label><input id="f_d" type="date" value="${l.date}"></div><div><label>เวลาเริ่ม</label><input id="f_s" type="time" value="${l.start}"></div></div>
+<label>นักเรียน</label>${sel('f_stu','students',l.studentId)}<label>วิชา</label>${sel('f_sub','subjects',l.subjectId)}<label>สถานที่</label>${sel('f_pl','places',l.placeId)}
+<div class="g2"><div><label>ชั่วโมง</label><input id="f_h" type="number" step="0.25" min="0.25" value="${l.hours}"></div><div><label>ค่าสอน ฿/ชม.</label><input id="f_r" type="number" value="${l.rate}"></div></div>
+<label>สถานะ</label><select id="f_st">${Object.keys(ST).map(k=>`<option value="${k}" ${l.status==k?'selected':''}>${ST[k]}</option>`).join('')}</select>
+
+<label>บันทึกการสอน</label><textarea id="f_n" style="margin-top:0">${esc(l.note)}</textarea>
+<label>การบ้านที่มอบหมาย</label><textarea id="f_hw" style="margin-top:0">${esc(l.homework)}</textarea><div class="acts"><button class="btn" data-a="aihw">✨ ให้เอไอช่วยคิดการบ้าน</button></div>
+<label>ภาพบันทึกการสอน</label><div class="acts" style="margin:0"><button class="btn" data-a="cam">📷 ถ่ายภาพ</button><button class="btn" data-a="up">🖼 อัปโหลดรูป</button></div><div class="ph" id="ph_m">${phs(tmpPh)}</div>
+${n?`<label>สอนซ้ำทุกสัปดาห์ (จำนวนสัปดาห์รวมครั้งนี้)</label><input id="f_rep" type="number" min="1" max="52" value="1">`:''}
+<div class="acts" style="margin-top:14px"><button class="btn pri" data-a="save">บันทึก</button><button class="btn" data-a="close">ปิด</button>${n?'':'<button class="btn bad" data-a="del" data-id="'+id+'">ลบคาบนี้</button>'}</div></div></div>`}
+const rateFor=(s,p)=>(find('students',s)?.rate)||(find('places',p)?.rate)||0;
+
+document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a,v=t.dataset.v,id=t.dataset.id,k=t.dataset.k;
+if(['note','rate','hw','sf','prof'].includes(a))return;
+if(a=='tab')tab=v;else if(a=='wk')wo+=+v;else if(a=='mode')mode=v;else if(a=='yr')yr+=+v;
+else if(a=='new')return edit(null,t.dataset.d);else if(a=='edit')return edit(id);
+else if(a=='cm')cm+=+v;else if(a=='cmode')cmode=v;else if(a=='pick')ss=id;
+else if(a=='rms'){if(t.dataset.sure!='1'){t.dataset.sure='1';t.textContent='แตะอีกครั้งเพื่อยืนยันลบ';return}S.students=S.students.filter(x=>x.id!=id);ss=null;save()}
+else if(a=='scam'||a=='sup'){pickPh(a=='scam',null,id);return}
+else if(a=='addstu'){const n=$('#ns_n').value.trim();if(!n){$('#ns_n').placeholder='กรุณาใส่ชื่อนักเรียนก่อน';$('#ns_n').focus();return}const o={id:uid(),name:n,rate:parseFloat($('#ns_r').value)||0};S.students.push(o);ss=o.id;save()}
+else if(a=='cam'||a=='up'){pickPh(a=='cam',id||null);return}
+else if(a=='view'){$('#modal2').innerHTML=`<div class="ov" style="z-index:12"><div class="sheet" style="text-align:center"><img src="${U(id)}" style="max-width:100%;max-height:70vh" alt=""><div class="acts" style="justify-content:center">${$('#ph_m')?`<button class="btn bad" data-a="rmph" data-id="${id}">ลบรูปนี้</button>`:''}<button class="btn" data-a="close2">ปิด</button></div></div></div>`;return}
+else if(a=='close2'){$('#modal2').innerHTML='';return}
+else if(a=='rmph'){tmpPh=tmpPh.filter(x=>x!=id);phDel(id);$('#ph_m').innerHTML=phs(tmpPh);$('#modal2').innerHTML='';return}
+else if(a=='rt')rt=v;else if(a=='pdf'){makePdf();return}
+else if(a=='aihw'){aihw();return}
+else if(a=='ask'){ask($('#aiq').value.trim());return}
+else if(a=='chip'){ask(chips[v]);return}
+else if(a=='aistu'){tab='ai';ask('ช่วยสรุปความก้าวหน้าของ '+find('students',id).name+' เทียบกับเป้าหมาย แล้วเสนอแผนการสอนและการบ้านสำหรับคาบถัดไป');return}
+else if(a=='close'){$('#modal').innerHTML='';return}
+else if(a=='st'){const l=find('lessons',id);l.status=l.status==v?'planned':v;save()}
+else if(a=='pay'){S.pay[v]=!S.pay[v];save()}
+else if(a=='save'){const o={date:$('#f_d').value,start:$('#f_s').value,studentId:$('#f_stu').value,subjectId:$('#f_sub').value,placeId:$('#f_pl').value,hours:parseFloat($('#f_h').value)||1,rate:parseFloat($('#f_r').value)||0,status:$('#f_st').value,note:$('#f_n').value,homework:$('#f_hw').value,photos:tmpPh};
+ if(!o.date)return;if(tmp)Object.assign(find('lessons',tmp),o);else{const n=Math.max(1,+($('#f_rep').value)||1);for(let i=0;i<n;i++)S.lessons.push({...o,id:uid(),date:iso(addD(pd(o.date),7*i))})}
+ save();$('#modal').innerHTML=''}
+else if(a=='del'){if(t.dataset.sure!='1'){t.dataset.sure='1';t.textContent='แตะอีกครั้งเพื่อยืนยันลบ';return}S.lessons=S.lessons.filter(l=>l.id!=id);save();$('#modal').innerHTML=''}
+else if(a=='add'){const n=$('#n_'+k).value.trim();if(!n)return;const o={id:uid(),name:n};if(k!='subjects')o.rate=parseFloat($('#r_'+k)?.value)||0;if(k=='places')o.type=$('#t_places').value;S[k].push(o);save()}
+else if(a=='rm'){S[k]=S[k].filter(x=>x.id!=id);save()}
+else if(a=='export'){$('#bk').value=JSON.stringify(S);$('#bk').select();return}
+else if(a=='import'){try{const o=JSON.parse($('#bk').value);if(!o.lessons||!o.students)throw 0;S=o;S.pay=S.pay||{};save()}catch(x){$('#bk').value='';$('#bk').placeholder='ข้อมูลไม่ถูกต้อง กรุณาวางข้อมูลสำรองที่คัดลอกจากแอปนี้';return}}
+R()});
+document.addEventListener('change',e=>{const t=e.target,a=t.dataset.a;
+if(a=='note'){find('lessons',t.dataset.id).note=t.value;save()}
+else if(a=='hw'){find('lessons',t.dataset.id).homework=t.value;save()}
+else if(a=='sf'){find('students',t.dataset.id)[t.dataset.f]=t.dataset.f=='rate'?(parseFloat(t.value)||0):t.value;save()}
+else if(a=='prof'){S.prof=S.prof||{};S.prof[t.dataset.f]=t.value;save()}
+else if(t.id=='r_d'){if(t.value){rd=t.value.length==7?t.value+'-01':t.value;R()}}
+else if(a=='rate'){find(t.dataset.k,t.dataset.id).rate=parseFloat(t.value)||0;save()}
+else if(t.id=='f_stu'||t.id=='f_pl'){$('#f_r').value=rateFor($('#f_stu').value,$('#f_pl').value)}});
+let cm=0,cmode='m',ss=null,tmpPh=[],aiout='',aibusy=false,aiqv='';const PH={};
+const idb=new Promise(r=>{try{const q=indexedDB.open('singph',1);q.onupgradeneeded=()=>q.result.createObjectStore('p');q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}catch(e){r(null)}});
+async function phLoad(){const d=await idb;if(!d)return;await new Promise(r=>{const q=d.transaction('p').objectStore('p').openCursor();q.onsuccess=()=>{const c=q.result;if(c){PH[c.key]=c.value;c.continue()}else r()};q.onerror=()=>r()})}
+async function phPut(id,v){PH[id]=v;const d=await idb;if(d)d.transaction('p','readwrite').objectStore('p').put(v,id)}
+async function phDel(id){delete PH[id];const d=await idb;if(d)d.transaction('p','readwrite').objectStore('p').delete(id)}
+const U=p=>PH[p]||(p.length==32?'/_blob/'+p:'');const phs=a=>(a||[]).map(p=>U(p)?`<img src="${U(p)}" data-a="view" data-id="${p}" alt="ภาพบันทึกการสอน">`:'').join('');
+const shrink=f=>new Promise(r=>{const fr=new FileReader();fr.onload=()=>{const i=new Image();i.onload=()=>{const k=Math.min(1,1280/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);c.toBlob(b=>r(b),'image/jpeg',.72)};i.onerror=()=>r(null);i.src=fr.result};fr.onerror=()=>r(null);fr.readAsDataURL(f)});
+function pickPh(cap,id,sid){const i=document.createElement('input');i.type='file';i.accept='image/*';i.multiple=true;if(cap)i.setAttribute('capture','environment');i.onchange=async()=>{for(const f of i.files){const v=await shrink(f);if(!v)continue;let p;try{p=(await (await claude.use('assets')).upload(v)).id}catch(e){setStat('อัปโหลดรูปไม่สำเร็จ');continue}if(sid)find('students',sid).photo=p;else if(id){const l=find('lessons',id);(l.photos=l.photos||[]).push(p)}else tmpPh.push(p)}save();if(sid||id)R();else $('#ph_m').innerHTML=phs(tmpPh)};i.click()}
+function vCal(){const now=new Date(),b=new Date(now.getFullYear(),now.getMonth()+cm,1),tdy=iso(now);
+const hd=`<div class="row"><div class="acts" style="margin:0"><button class="btn ${cmode=='m'?'pri':''}" data-a="cmode" data-v="m">เดือน</button><button class="btn ${cmode=='w'?'pri':''}" data-a="cmode" data-v="w">สัปดาห์</button></div>${cmode=='m'?`<div class="acts" style="margin:0"><button class="btn" data-a="cm" data-v="-1">‹</button><b>${th(b,{month:'long',year:'numeric'})}</b><button class="btn" data-a="cm" data-v="1">›</button></div>`:''}</div>`;
+if(cmode=='w')return hd+vWeek();
+let g=['จ','อ','พ','พฤ','ศ','ส','อา'].map(x=>`<div class="h">${x}</div>`).join('');const s=wk(b);
+for(let i=0;i<42;i++){const d=addD(s,i),k=iso(d);if(i>=35&&d.getMonth()!=b.getMonth())break;const ls=sorted(S.lessons.filter(l=>l.date==k));
+g+=`<div class="${k==tdy?'tdy':''} ${d.getMonth()!=b.getMonth()?'o':''}" data-a="new" data-d="${k}"><div class="d">${d.getDate()}</div>${ls.slice(0,4).map(l=>{const p=find('places',l.placeId),u=find('students',l.studentId);return `<div class="ev ${p?p.type:''}" style="${l.status=='cancel'?'opacity:.4':''}" data-a="edit" data-id="${l.id}">${l.start} ${esc(u?u.name:'—')}</div>`}).join('')}${ls.length>4?`<div class="d">+${ls.length-4}</div>`:''}</div>`}
+return hd+`<div class="cal" style="margin-top:10px">${g}</div><div class="mut" style="margin-top:8px">น้ำเงิน = โรงเรียน · น้ำตาล = รับเอง · เขียว = ออนไลน์ · กดช่องวันเพื่อเพิ่มคาบ กดชื่อเพื่อแก้ไข</div>`}
+function vStu(){if(!S.students.length)return addFrm()+'<div class="empty">ยังไม่มีนักเรียน กรอกชื่อด้านบนแล้วกดเพิ่มได้เลย</div>';const s=find('students',ss)||S.students[0];ss=s.id;const ls=sorted(S.lessons.filter(l=>l.studentId==s.id)).reverse(),hw=ls.find(l=>l.homework);
+const hist=l=>{const u=find('subjects',l.subjectId);return `<div class="card"><div class="row"><b>${l.date} ${l.start} · ${u?esc(u.name):''}</b><span class="mut">${ST[l.status]}</span></div>${l.note?`<div>📝 ${esc(l.note)}</div>`:''}${l.homework?`<div>📚 ${esc(l.homework)}</div>`:''}<div class="ph">${phs(l.photos)}</div><button class="btn" style="margin-top:6px" data-a="edit" data-id="${l.id}">แก้ไข</button></div>`};
+return `<div class="split"><div>${addFrm()}${S.students.map(x=>`<button class="btn" style="width:100%;text-align:left;margin-bottom:6px;${x.id==s.id?'background:var(--ac);color:var(--acx)':''}" data-a="pick" data-id="${x.id}"><span style="display:flex;align-items:center;gap:8px">${av(x)}${esc(x.name)}</span></button>`).join('')}</div>
+<div><div class="row" style="justify-content:flex-start;gap:14px">${av(s,88)}<div><h2 style="margin:0">${esc(s.name)}</h2><div class="acts"><button class="btn" data-a="scam" data-id="${s.id}">📷 ถ่ายรูปนักเรียน</button><button class="btn" data-a="sup" data-id="${s.id}">🖼 อัปโหลดรูป</button></div></div></div><label>ค่าสอนต่อชั่วโมง (฿)</label><input type="number" data-a="sf" data-f="rate" data-id="${s.id}" value="${s.rate||0}"><label>เป้าหมายของนักเรียน</label><textarea data-a="sf" data-f="goal" data-id="${s.id}" style="margin-top:0" placeholder="เช่น สอบเข้าคณะดนตรี ร้องเพลงในงานโรงเรียน ขยายเสียงสูง">${esc(s.goal)}</textarea>
+<label>แผนการสอน / ข้อมูลเพิ่มเติม</label><textarea data-a="sf" data-f="info" data-id="${s.id}" style="margin-top:0" placeholder="พื้นฐาน จุดที่ต้องพัฒนา เพลงที่ซ้อมอยู่">${esc(s.info)}</textarea>
+<div class="card"><b>การบ้านล่าสุด</b><div>${hw?esc(hw.homework)+' <span class="mut">('+hw.date+')</span>':'<span class="mut">ยังไม่มี</span>'}</div></div>
+${(()=>{const d=ls.filter(l=>l.status=='done'),a=d.reduce((x,l)=>x+inc(l),0),p=d.filter(l=>isPaid(l)).reduce((x,l)=>x+inc(l),0);return `<div class="stat" style="margin-top:10px"><div><b>${d.reduce((x,l)=>x+l.hours,0)} ชม.</b><span>ชั่วโมงสอนสะสม</span></div><div><b>${money(a)}</b><span>รายได้จากนักเรียนคนนี้</span></div><div><b>${money(p)}</b><span>โรงเรียนจ่ายแล้ว</span></div><div><b>${money(a-p)}</b><span>รอจ่าย</span></div></div>`})()}
+<div class="acts"><button class="btn pri" data-a="aistu" data-id="${s.id}">✨ ให้เอไอสรุปความก้าวหน้าและเสนอแผน</button><button class="btn" data-a="new" data-d="${iso(new Date())}">+ เพิ่มคาบ</button><button class="btn bad" data-a="rms" data-id="${s.id}">ลบนักเรียน</button></div>
+<h2>ประวัติการสอน (${ls.length} คาบ)</h2>${ls.map(hist).join('')||'<div class="empty">ยังไม่มีประวัติ</div>'}</div></div>`}
+const chips=['สัปดาห์นี้ฉันสอนกี่ชั่วโมงและได้เงินเท่าไหร่','ใครยังค้างจ่ายอยู่บ้าง','สรุปเป้าหมายและการบ้านของนักเรียนทุกคน','นักเรียนคนไหนไม่ได้เรียนมานานแล้ว'];
+function vAi(){return `<h2 style="margin-top:0">ถามเอไอเกี่ยวกับข้อมูลการสอนทั้งหมด</h2><div class="mut">เอไออ่านข้อมูลนักเรียน เป้าหมาย คาบสอน บันทึก การบ้าน และรายได้ในเว็บนี้ แล้วตอบเป็นภาษาไทย (ยังไม่อ่านรูปภาพ)</div><textarea id="aiq" placeholder="เช่น น้องมายด์ควรฝึกอะไรต่อ / เดือนนี้โรงเรียนไหนสอนมากสุด">${esc(aiqv)}</textarea><div class="acts"><button class="btn pri" data-a="ask">ถามเอไอ</button>${chips.map((c,i)=>`<button class="btn" data-a="chip" data-v="${i}">${c}</button>`).join('')}</div><div class="ai" id="ai_out" ${aiout?'':'hidden'}>${esc(aiout)}</div>`}
+function ctx(){const sn=id=>find('students',id)?.name,un=id=>find('subjects',id)?.name,pn=id=>{const p=find('places',id);return p?p.name+' ('+TL[p.type]+')':''};return JSON.stringify({วันนี้:iso(new Date()),นักเรียน:S.students.map(s=>({ชื่อ:s.name,ค่าสอน:s.rate,เป้าหมาย:s.goal||'',ข้อมูล:s.info||''})),คาบสอน:sorted(S.lessons).slice(-300).map(l=>({วันที่:l.date,เวลา:l.start,ชั่วโมง:l.hours,นักเรียน:sn(l.studentId),วิชา:un(l.subjectId),สถานที่:pn(l.placeId),สถานะ:ST[l.status],ค่าสอนต่อชม:l.rate,โรงเรียนจ่ายแล้ว:isPaid(l),บันทึก:l.note||'',การบ้าน:l.homework||'',จำนวนรูป:(l.photos||[]).length}))})}
+async function ask(q){if(!q||aibusy)return;aiqv=q;aibusy=true;aiout='กำลังคิด…';R();try{const sm=await claude.use('sample');if(!sm)throw {message:'ไม่ได้รับอนุญาตให้ใช้เอไอ'};const r=await sm(`คุณคือผู้ช่วยของครูสอนร้องเพลง ตอบเป็นภาษาไทย กระชับ ตรงประเด็น ใช้เฉพาะข้อมูลด้านล่าง ถ้าไม่มีข้อมูลให้บอกตรงๆ รายได้นับเฉพาะคาบสถานะมาเรียน (ชั่วโมง × ค่าสอน)\n\nข้อมูล:\n${ctx()}\n\nคำถาม: ${q}`,{cache:false,onText:x=>{aiout=x.text;const o=$('#ai_out');if(o){o.hidden=false;o.textContent=aiout}}});aiout=r.text}catch(e){aiout='เอไอตอบไม่ได้: '+(e&&e.message||'ลองใหม่อีกครั้ง')}aibusy=false;R()}
+async function aihw(){const s=find('students',$('#f_stu').value),u=find('subjects',$('#f_sub').value),b=$('[data-a=aihw]');b.textContent='กำลังคิด…';try{const sm=await claude.use('sample');if(!sm)throw 0;const r=await sm(`คุณเป็นผู้ช่วยครูสอนร้องเพลง เสนอการบ้าน 2-3 ข้อ สั้นๆ ภาษาไทย ไม่ต้องมีคำนำ\nนักเรียน: ${s?s.name:''}\nเป้าหมาย: ${s?.goal||'-'}\nวิชา: ${u?.name||''}\nบันทึกการสอนวันนี้: ${$('#f_n').value||'-'}`,{cache:false});$('#f_hw').value=r.text;b.textContent='✨ ให้เอไอช่วยคิดการบ้าน'}catch(e){b.textContent='ใช้เอไอไม่ได้ ลองอีกครั้ง'}}
+let rt='m',rd=iso(new Date());
+function rrange(){const d=pd(rd);if(rt=='d')return[rd,rd,th(d,{weekday:'long',day:'numeric',month:'long',year:'numeric'})];if(rt=='w'){const s=wk(d),e=addD(s,6);return[iso(s),iso(e),'สัปดาห์ '+th(s,{day:'numeric',month:'short'})+' – '+th(e,{day:'numeric',month:'short',year:'numeric'})]}return[rd.slice(0,7)+'-01',iso(new Date(d.getFullYear(),d.getMonth()+1,0)),'เดือน '+th(d,{month:'long',year:'numeric'})]}
+const baht=v=>{const n=Math.round(v*100),b=Math.floor(n/100),s=n%100;if(!n)return 'ศูนย์บาทถ้วน';const D=['','หนึ่ง','สอง','สาม','สี่','ห้า','หก','เจ็ด','แปด','เก้า'],U=['','สิบ','ร้อย','พัน','หมื่น','แสน'];
+const t=x=>{const q=String(x);let r='';for(let i=0;i<q.length;i++){const c=+q[i],p=q.length-i-1;if(!c)continue;r+=(p==1&&c==2)?'ยี่':(p==1&&c==1)?'':(p==0&&c==1&&q.length>1&&q[q.length-2]!='0')?'เอ็ด':D[c];r+=U[p]}return r};
+const f=x=>x>=1e6?f(Math.floor(x/1e6))+'ล้าน'+(x%1e6?t(x%1e6):''):t(x);return (b?f(b)+'บาท':'')+(s?t(s)+'สตางค์':'ถ้วน')};
+function slipHtml(){const[a,e,t]=rrange(),all=S.lessons.filter(l=>l.date>=a&&l.date<=e),D=sorted(all.filter(l=>l.status=='done')),pr=S.prof||{},w=parseFloat(pr.wht)||0,g={};
+D.forEach(l=>{const k=l.placeId+'|'+l.rate,r=g[k]=g[k]||{p:find('places',l.placeId),rate:l.rate,h:0,a:0,pd:isPaid(l)};r.h+=l.hours;r.a+=inc(l)});
+const rows=Object.values(g),gross=rows.reduce((x,r)=>x+r.a,0),hrs=rows.reduce((x,r)=>x+r.h,0),tax=gross*w/100,net=gross-tax,ab=all.filter(l=>l.status=='absent').length,cn=all.filter(l=>l.status=='cancel').length,dl=d=>th(pd(d),{day:'numeric',month:'long',year:'numeric'});
+return `<div class="rpt slip" id="rpt"><div class="sh"><div><div class="st1">ใบสรุปรายได้ค่าสอน</div><div class="st2">PAYSLIP · ผู้ให้บริการอิสระ (บุคคลธรรมดา)</div></div><div class="sr">ประจำ${t}<br>เลขที่ INC-${+a.slice(0,4)+543}${a.slice(5,7)}</div></div>
+<div class="sg"><div><label>ผู้รับเงิน</label><b>${esc(pr.name||'(ยังไม่ได้ระบุชื่อ — ตั้งค่าได้ที่แท็บตั้งค่า)')}</b><div>อาชีพ: ครูสอนร้องเพลง</div></div><div><label>รอบการสอน</label><b>${dl(a)} – ${dl(e)}</b><div>จัดทำเมื่อ ${th(new Date(),{day:'numeric',month:'long',year:'numeric'})}</div></div></div>
+<table><tr><th>รายการรายได้ (ผู้จ่ายเงิน)</th><th class="n">ชม.</th><th class="n">อัตรา/ชม.</th><th class="n">จำนวนเงิน</th><th>สถานะรับเงิน</th></tr>
+${rows.map(r=>`<tr><td>ค่าสอนร้องเพลง — ${r.p?esc(r.p.name)+' ('+TL[r.p.type]+')':'—'}</td><td class="n">${r.h}</td><td class="n">${money(r.rate)}</td><td class="n">${money(r.a)}</td><td>${r.pd?'ได้รับแล้ว':'รอรับ'}</td></tr>`).join('')||'<tr><td colspan="5">ไม่มีรายได้ในเดือนนี้</td></tr>'}
+<tr class="tt"><td>รวมรายได้</td><td class="n">${hrs}</td><td></td><td class="n">${money(gross)}</td><td></td></tr>
+<tr><th colspan="3">รายการหัก</th><th class="n">จำนวนเงิน</th><th></th></tr><tr><td colspan="3">ภาษีหัก ณ ที่จ่าย ${w}%</td><td class="n">${money(tax)}</td><td></td></tr></table>
+<div class="net"><div><label>รายได้สุทธิ</label><b>${money(net)}</b></div><div class="bt">(${baht(net)})</div></div>
+<div class="sg"><div><label>สรุปการสอน</label>สอน ${D.length} คาบ · ${hrs} ชั่วโมง<br>ขาด ${ab} คาบ · ยกเลิก ${cn} คาบ (ไม่นับเป็นรายได้)</div><div class="sig">ลงชื่อ .............................. ผู้รับเงิน<br>${esc(pr.name||'')}</div></div>
+<h3>เอกสารแนบ: รายละเอียดคาบสอน</h3><table><tr><th>วันที่</th><th>เวลา</th><th>นักเรียน</th><th>วิชา</th><th>สถานที่</th><th class="n">ชม.</th><th class="n">ยอด</th></tr>${D.map(l=>{const s=find('students',l.studentId),u=find('subjects',l.subjectId),p=find('places',l.placeId);return `<tr><td>${l.date.slice(8)}/${l.date.slice(5,7)}</td><td>${l.start}</td><td>${s?esc(s.name):'—'}</td><td>${u?esc(u.name):''}</td><td>${p?esc(p.name):''}</td><td class="n">${l.hours}</td><td class="n">${money(inc(l))}</td></tr>`}).join('')}</table>
+<div class="fn">เอกสารนี้จัดทำเองโดยผู้รับเงินเพื่อบันทึกรายได้จากข้อมูลการสอน ไม่ใช่เอกสารจากผู้จ่ายเงินหรือหนังสือรับรองการหักภาษีอย่างเป็นทางการ</div></div>`}
+const av=(s,z=40)=>{const u=s&&s.photo?U(s.photo):'';return u?`<img src="${u}" alt="" style="width:${z}px;height:${z}px;border-radius:50%;object-fit:cover;flex:none">`:`<span style="width:${z}px;height:${z}px;border-radius:50%;background:var(--bd);color:var(--mut);display:inline-flex;align-items:center;justify-content:center;font-weight:700;flex:none;font-size:${Math.round(z/2.4)}px">${esc(((s&&s.name)||'?').trim().slice(0,1))}</span>`};
+const addFrm=()=>`<div class="card"><b>+ เพิ่มนักเรียน</b><input id="ns_n" placeholder="ชื่อนักเรียน" style="margin-top:6px"><input id="ns_r" type="number" placeholder="ค่าสอน ฿/ชม. (ถ้ามี)" style="margin-top:6px"><button class="btn pri" style="width:100%;margin-top:6px" data-a="addstu">เพิ่มนักเรียน</button></div>`;
+const DEF_PROF={name:'วิชญาน โพธิ์แก้ว',taxId:'1419902177268'},PR=()=>({...DEF_PROF,...(S.prof||{})});
+function slipOfficial(){const[a,e,t]=rrange(),all=S.lessons.filter(l=>l.date>=a&&l.date<=e),D=sorted(all.filter(l=>l.status=='done')),pr=PR(),w=parseFloat(pr.wht)||0,g={};
+D.forEach(l=>{const k=l.placeId+'|'+l.rate,r=g[k]=g[k]||{p:find('places',l.placeId),rate:l.rate,h:0,a:0,pd:isPaid(l)};r.h+=l.hours;r.a+=inc(l)});
+const rows=Object.values(g),gross=rows.reduce((x,r)=>x+r.a,0),hrs=rows.reduce((x,r)=>x+r.h,0),tax=gross*w/100,net=gross-tax,ab=all.filter(l=>l.status=='absent').length,cn=all.filter(l=>l.status=='cancel').length,dl=d=>th(typeof d=='string'?pd(d):d,{day:'numeric',month:'long',year:'numeric'}),id=String(pr.taxId||'').replace(/^(\d)(\d{4})(\d{5})(\d{2})(\d)$/,'$1-$2-$3-$4-$5');
+return `<div class="rpt slip" id="rpt"><div class="ti"><div class="t1">ใบสรุปรายได้ค่าสอน</div><div class="t2">INCOME STATEMENT · ประจำ${t}</div></div>
+<div class="meta"><span>เลขที่เอกสาร: INC-${+a.slice(0,4)+543}${a.slice(5,7)}-01</span><span>วันที่ออกเอกสาร: ${dl(new Date())}</span></div>
+<div class="bx"><div><b>ชื่อ-นามสกุลผู้รับเงิน</b>${esc(pr.name)}</div><div><b>เลขประจำตัวประชาชน</b>${esc(id)}</div>${pr.addr?`<div><b>ที่อยู่</b>${esc(pr.addr)}</div>`:''}<div><b>ลักษณะงาน</b>ผู้ให้บริการสอนร้องเพลงอิสระ (บุคคลธรรมดา)</div><div><b>รอบการสอน</b>${dl(a)} – ${dl(e)}</div></div>
+<table><tr><th>ลำดับ</th><th>รายการ / ผู้จ่ายเงิน</th><th>ชม.</th><th>อัตรา/ชม.</th><th>จำนวนเงิน</th><th>สถานะรับเงิน</th></tr>
+${rows.map((r,i)=>`<tr><td class="c">${i+1}</td><td>ค่าสอนร้องเพลง — ${r.p?esc(r.p.name)+' ('+TL[r.p.type]+')':'—'}</td><td class="n">${r.h}</td><td class="n">${money(r.rate)}</td><td class="n">${money(r.a)}</td><td class="c">${r.pd?'ได้รับแล้ว':'รอรับ'}</td></tr>`).join('')||'<tr><td colspan="6" class="c">ไม่มีรายได้ในเดือนนี้</td></tr>'}
+<tr class="tt"><td colspan="2">รวมรายได้ก่อนหักภาษี</td><td class="n">${hrs}</td><td></td><td class="n">${money(gross)}</td><td></td></tr>
+<tr><td colspan="4">หัก ภาษีเงินได้หัก ณ ที่จ่าย ${w}%</td><td class="n">${money(tax)}</td><td></td></tr></table>
+<div class="net"><div>รายได้สุทธิ<br><b>${money(net)}</b></div><div class="bt">(${baht(net)})</div></div>
+<div class="meta"><span>จำนวนคาบสอน ${D.length} คาบ · ${hrs} ชั่วโมง</span><span>ขาด ${ab} คาบ · ยกเลิก ${cn} คาบ (ไม่นับเป็นรายได้)</span></div>
+<div class="sigs"><div>ข้าพเจ้าขอรับรองว่ารายการข้างต้นถูกต้อง<br>ตรงตามบันทึกการสอนของข้าพเจ้า</div><div>ลงชื่อ ................................ ผู้รับเงิน<br>(${esc(pr.name)})<br>วันที่ ......../......../........</div></div>
+<h3>เอกสารแนบ: รายละเอียดคาบสอน</h3><table><tr><th>ลำดับ</th><th>วันที่</th><th>เวลา</th><th>นักเรียน</th><th>วิชา</th><th>สถานที่</th><th>ชม.</th><th>ยอด</th></tr>${D.map((l,i)=>{const s=find('students',l.studentId),u=find('subjects',l.subjectId),p=find('places',l.placeId);return `<tr><td class="c">${i+1}</td><td>${l.date.slice(8)}/${l.date.slice(5,7)}</td><td>${l.start}</td><td>${s?esc(s.name):'—'}</td><td>${u?esc(u.name):''}</td><td>${p?esc(p.name):''}</td><td class="n">${l.hours}</td><td class="n">${money(inc(l))}</td></tr>`}).join('')}</table>
+<div class="fn">เอกสารนี้จัดทำเองโดยผู้รับเงินเพื่อบันทึกรายได้จากข้อมูลการสอน ไม่ใช่เอกสารจากผู้จ่ายเงินหรือหนังสือรับรองการหักภาษีอย่างเป็นทางการ</div></div>`}
+function rptHtml(){if(rt=='m')return slipOfficial();const[a,e,t]=rrange(),ls=sorted(S.lessons.filter(l=>l.date>=a&&l.date<=e&&l.status!='cancel')),D=ls.filter(l=>l.status=='done'),h=D.reduce((x,l)=>x+l.hours,0),m=D.reduce((x,l)=>x+inc(l),0);
+const row=l=>{const s=find('students',l.studentId),u=find('subjects',l.subjectId),p=find('places',l.placeId);return `<tr><td>${l.date.slice(8)}/${l.date.slice(5,7)}</td><td>${l.start}</td><td>${s?esc(s.name):'—'}</td><td>${u?esc(u.name):''}</td><td>${p?esc(p.name):''}</td><td>${l.hours}</td><td>${ST[l.status]}</td><td>${money(inc(l))}</td></tr>${l.note||l.homework?`<tr class="nt"><td></td><td colspan="7">${l.note?'บันทึก: '+esc(l.note):''}${l.note&&l.homework?'<br>':''}${l.homework?'การบ้าน: '+esc(l.homework):''}</td></tr>`:''}`};
+const bp={};D.forEach(l=>{const p=find('places',l.placeId),k=p?p.name:'—',r=bp[k]=bp[k]||{h:0,a:0,pd:true};r.h+=l.hours;r.a+=inc(l);if(!isPaid(l))r.pd=false});
+return `<div class="rpt" id="rpt"><h2>รายงานการสอนร้องเพลง — ${t}</h2><div class="rm">จัดทำเมื่อ ${th(new Date(),{day:'numeric',month:'long',year:'numeric'})}</div>
+<div class="rs"><span>จำนวนคาบ<b>${ls.length}</b></span><span>ชั่วโมงสอน (มาเรียน)<b>${h}</b></span><span>รายได้ (มาเรียน)<b>${money(m)}</b></span></div>
+<table><tr><th>วันที่</th><th>เวลา</th><th>นักเรียน</th><th>วิชา</th><th>สถานที่</th><th>ชม.</th><th>สถานะ</th><th>ยอด</th></tr>${ls.map(row).join('')||'<tr><td colspan="8">ไม่มีคาบสอนในช่วงนี้</td></tr>'}</table>
+<h3>สรุปตามสถานที่ (เฉพาะคาบมาเรียน)</h3><table><tr><th>สถานที่</th><th>ชม.</th><th>ยอด</th><th>การจ่ายเงิน</th></tr>${Object.keys(bp).map(k=>`<tr><td>${esc(k)}</td><td>${bp[k].h}</td><td>${money(bp[k].a)}</td><td>${bp[k].pd?'โรงเรียนจ่ายแล้ว':'รอจ่าย'}</td></tr>`).join('')||'<tr><td colspan="4">—</td></tr>'}</table></div>`}
+function vRpt(){return `<h2 style="margin-top:0">ส่งออกรายงานเป็น PDF</h2><div class="mut">ใช้เก็บเป็นหลักฐานและสำรองข้อมูล แยกเป็นรายวัน รายสัปดาห์ หรือรายเดือน (รายงานไม่รวมรูปภาพ)</div>
+<div class="seg">${[['d','รายวัน'],['w','รายสัปดาห์'],['m','รายเดือน']].map(x=>`<button class="btn ${rt==x[0]?'pri':''}" data-a="rt" data-v="${x[0]}">${x[1]}</button>`).join('')}</div>
+<div class="g2"><div>${rt=='m'?`<input type="month" id="r_d" value="${rd.slice(0,7)}">`:`<input type="date" id="r_d" value="${rd}">`}</div><div><button class="btn pri" style="width:100%" data-a="pdf">บันทึกเป็น PDF</button></div></div><div class="mut" id="r_st" style="margin-top:6px"></div>
+<div class="rwrap">${rptHtml()}</div>`}
+async function makePdf(){const st=$('#r_st');st.textContent='กำลังสร้าง PDF…';try{const cv=await html2canvas($('#rpt'),{scale:2,backgroundColor:'#ffffff'}),{jsPDF}=window.jspdf,pdf=new jsPDF({unit:'mm',format:'a4'}),W=210,ph=Math.floor(cv.width*297/210);let y=0;
+while(y<cv.height){const c=document.createElement('canvas');c.width=cv.width;c.height=Math.min(ph,cv.height-y);const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(cv,0,y,cv.width,c.height,0,0,cv.width,c.height);if(y)pdf.addPage();pdf.addImage(c.toDataURL('image/jpeg',.9),'JPEG',0,0,W,c.height*W/cv.width);y+=ph}
+const blob=pdf.output('blob'),name='teaching-report-'+rt+'-'+rrange()[0]+'.pdf';
+try{await (await claude.use('downloads')).save({filename:name,data:blob});st.textContent='✓ บันทึกไฟล์แล้ว'}catch(e){const w=window.open(URL.createObjectURL(blob),'_blank');st.textContent=w?'เปิด PDF ในแท็บใหม่แล้ว กดแชร์หรือบันทึกจากตรงนั้น':'บันทึกไฟล์ไม่สำเร็จ ลองใหม่อีกครั้ง'}}catch(e){st.textContent='สร้าง PDF ไม่สำเร็จ ลองใหม่อีกครั้ง'}}
+R();phLoad().then(R);dbLoad();
+</script></body></html>
